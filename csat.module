@@ -1,0 +1,262 @@
+<?php
+
+/**
+ * @file
+ * Add csat link to pages.
+ */
+
+use Drupal\Core\Url;
+use Drupal\node\Entity\Node;
+use Drupal\Component\Serialization\Json;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_page_bottom().
+ */
+function csat_page_bottom(array &$page_bottom) {
+  $user_access = \Drupal::currentUser()->hasPermission('access csat form');
+  $config   = \Drupal::config('csat.settings');
+  // $top      = !empty( $config->get('top') ) ? $config->get('top') :'';
+  // $height   = !empty( $config->get('height') ) ? $config->get('height') :'';
+  // $width    = !empty( $config->get('width') ) ? $config->get('width') :'';
+  // $question = !empty( $config->get('question') ) ? $config->get('question') :'';
+  // $message  = !empty( $config->get('message') ) ? $config->get('message') :'';
+  // $bgcolor  = !empty( $config->get('bgcolor') ) ? $config->get('bgcolor') :'';
+  // $align    = !empty( $config->get('align') )  ? $config->get('align') :'';
+  // $minutes  = !empty( $config->get('minutes') ) ? $config->get('minutes') :'';
+  // $open     = !empty( $config->get('autoopen') ) ? $config->get('autoopen') :'';
+  // $basepath = \Drupal::request()->getSchemeAndHttpHost(). '/' ; 
+  // $rootpath = \Drupal::request()->getHost(). '/' . drupal_get_path('module', 'csat');//substr(drupal_get_path_alias(), 0, strripos(drupal_get_path_alias(), '/') );
+  // $path     = \Drupal::request()->getSchemeAndHttpHost(). '/' .drupal_get_path('module', 'csat');
+  // $allow    = !empty( $config->get('allow') ) ? $config->get('allow') :'';
+  // $deny     = !empty( $config->get('disable') ) ? $config->get('disable') :'';
+  // $enabled  = !empty( $config->get('global') ) ? $config->get('global') :'';
+
+  // $page_bottom['hidden'] = [
+  //     '#type' => 'container',
+  //     '#attributes' => [
+  //       'id' => ['csat_hidden'],
+  //     ],
+  //     'link' => [
+  //       '#type' => 'link',
+  //       '#markup' => '<input type="hidden" name="config_top" value="$top" />
+  //                     <input type="hidden" name="config_height" value="$height" />
+  //                     <input type="hidden" name="config_width" value="$width" />
+  //                     <input type="hidden" name="config_question" value="$question" />
+  //                     <input type="hidden" name="config_message" value="$message" />
+  //                     <input type="hidden" name="config_bgcolor" value="$bgcolor" />
+  //                     <input type="hidden" name="config_align" value="$align" />
+  //                     <input type="hidden" name="config_minutes" value="$minutes" />
+  //                     <input type="hidden" name="config_open" value="$open" />
+  //                     <input type="hidden" name="config_basepath" value="$basepath" />
+  //                     <input type="hidden" name="config_rootpath" value="$rootpath" />
+  //                     <input type="hidden" name="config_path" value="$path" />
+  //                     <input type="hidden" name="config_allow" value="$allow" />
+  //                     <input type="hidden" name="config_deny" value="$deny" />
+  //                     <input type="hidden" name="config_enabled" value="$enabled" />',
+  //       '#title' => '',
+  //       '#url' => '',
+  //     ],
+  // ];
+
+  if ($user_access && csat_access_block()) {
+    // $config = \Drupal::config('csat.settings');
+    $dialog = [
+      'dialogClass' => 'token-tree-dialog',
+      'draggable' => TRUE,
+    ];
+
+    if ($config->get('dialog_size') == 1) {
+      $options = array_merge($dialog, ['autoResize' => TRUE]);
+    }
+    else {
+      $options = array_merge($dialog, ['width' => $config->get('dialog_width') . '%']);
+    }
+
+
+
+
+    $contentFeedbackBlock = [
+      '#type' => 'container',
+      '#attributes' => [
+        'id' => ['csat'],
+      ],
+      'link' => [
+        '#type' => 'link',
+        '#markup' => '
+                      <a  href="#" 
+                          class="sweet-csat csat csat-'.$config->get('align').'"
+                          style="top: '.$config->get('top').'; height:'.$config->get('height').'px; width: '.$config->get('width').'px;"
+                          data-toggle="tooltip" 
+                          data-placement="top" 
+                          title="CSAT"
+                          >
+                        <img alt='.$config->get('alt').' src='.$config->get('image').' height='.$config->get('height').' width='.$config->get('width').' />
+                      </a>',
+        '#title' => '',
+        '#url' => '',
+      ],
+    ];
+    $page_bottom['feedback'] = $contentFeedbackBlock;
+    
+  }
+
+}
+
+/**
+ * Implements hook_page_attachments().
+ */
+function csat_page_attachments(array &$attachments) {
+  $current_path = \Drupal::request()->getRequestUri() ;
+  // $current_path = substr(\Drupal::request()->getRequestUri(), strripos(\Drupal::request()->getRequestUri(), '/')) ;
+  // if($current_path != '/csat_report')
+  if(strpos($current_path, '/csat_report') == false)
+  {
+    $attachments['#attached']['library'][] = 'csat/csat-link';
+  }
+  if (\Drupal::currentUser()->hasPermission('access csat form')) {
+    $config                                = \Drupal::config('csat.settings');
+    $attachments['#attached']['library'][] = 'core/drupal.ajax';
+
+    $alias              = \Drupal::service('path_alias.manager')->getAliasByPath($current_path);
+    $path_matches       = \Drupal::service('path.matcher')->matchPath($alias, $config->get('disable'));
+    $path_matches_allow = \Drupal::service('path.matcher')->matchPath($alias, $config->get('allow'));
+    
+    $top                = !empty( $config->get('top') ) ? $config->get('top') :'';
+    $height             = !empty( $config->get('height') ) ? $config->get('height') :'';
+    $width              = !empty( $config->get('width') ) ? $config->get('width') :'';
+    $question           = !empty( $config->get('question') ) ? $config->get('question') :'';
+    $message            = !empty( $config->get('message') ) ? $config->get('message') :'';
+    $bgcolor            = !empty( $config->get('bgcolor') ) ? $config->get('bgcolor') :'';
+    $align              = !empty( $config->get('align') )  ? $config->get('align') :'';
+    $minutes            = !empty( $config->get('minutes') ) ? $config->get('minutes') :'';
+    $open               = !empty( $config->get('autoopen') ) ? $config->get('autoopen') :'';
+    $basepath           = \Drupal::request()->getSchemeAndHttpHost(). '/' ; 
+    $rootpath           = \Drupal::request()->getHost(). '/' . drupal_get_path('module', 'csat');//substr(drupal_get_path_alias(), 0, strripos(drupal_get_path_alias(), '/') );
+    $path               = \Drupal::request()->getSchemeAndHttpHost(). '/' .drupal_get_path('module', 'csat');
+    $allow              = !empty( $path_matches_allow ) ? $path_matches_allow :'';
+    $deny               = !empty( $path_matches ) ? $path_matches :'';
+    $enabled            = !empty( $config->get('global') ) ? $config->get('global') :'';
+    $attachments['#attached']['html_head'][] = [
+      [
+        '#tag'   => 'script',
+        '#value' => "var config_message = '$message' ;
+                     var config_top = '$top' ;
+                     var config_height = '$height' ;
+                     var config_width = '$width' ;
+                     var config_question = '$question' ;
+                     var config_bgcolor = '$bgcolor' ;
+                     var config_align = '$align' ;
+                     var config_minutes = '$minutes' ;
+                     var config_open = '$open' ;
+                     var config_basepath = '$basepath' ;
+                     var config_rootpath = '$rootpath' ;
+                     var config_path = '$path' ;
+                     var config_allow = '$allow' ;
+                     var config_deny = '$deny' ;
+                     var config_enabled = '$enabled' ;",
+      ],
+      'access csat form',
+    ];
+  }
+}
+
+/**
+ * Check user access to csat block.
+ *
+ * @return bool
+ *   Access check. Default is FALSE.
+ */
+function csat_access_block() {
+  $current_path       = \Drupal::service('path.current')->getPath();
+  $alias              = \Drupal::service('path_alias.manager')->getAliasByPath($current_path);
+  $config             = \Drupal::config('csat.settings');
+  $path_matches       = \Drupal::service('path.matcher')->matchPath($alias, $config->get('disable'));
+  $path_matches_allow = \Drupal::service('path.matcher')->matchPath($alias, $config->get('allow'));
+  $types              = (!empty($config->get('content_types'))) ? $config->get('content_types') : [];
+
+  if (!$path_matches) {
+    if ($config->get('global') == 1) {
+      return TRUE;
+    }
+    elseif ($config->get('global') == 0 && $node = \Drupal::routeMatch()->getParameter('node')) {
+      if (is_numeric($node)) {
+        $node = Node::load($node);
+      }
+      if (in_array($node->getType(), $types)) {
+        return TRUE;
+      }
+    }
+  }
+
+  if($path_matches_allow){
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+/**
+ * Implements hook_help().
+ */
+function csat_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'admin/config/content/csat':
+      return t('Set the basic configuration for csat');
+  }
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function csat_preprocess_page(&$variables) {
+  $config             = \Drupal::config('csat.settings');
+  $current_path       = \Drupal::service('path.current')->getPath();
+  $alias              = \Drupal::service('path_alias.manager')->getAliasByPath($current_path);
+  $path_matches       = \Drupal::service('path.matcher')->matchPath($alias, $config->get('disable'));
+  $path_matches_allow = \Drupal::service('path.matcher')->matchPath($alias, $config->get('allow'));
+  
+  $top                = !empty( $config->get('top') ) ? $config->get('top') :'';
+  $height             = !empty( $config->get('height') ) ? $config->get('height') :'';
+  $width              = !empty( $config->get('width') ) ? $config->get('width') :'';
+  $question           = !empty( $config->get('question') ) ? $config->get('question') :'';
+  $message            = !empty( $config->get('message') ) ? $config->get('message') :'';
+  $bgcolor            = !empty( $config->get('bgcolor') ) ? $config->get('bgcolor') :'';
+  $align              = !empty( $config->get('align') )  ? $config->get('align') :'';
+  $minutes            = !empty( $config->get('minutes') ) ? $config->get('minutes') :'';
+  $open               = !empty( $config->get('autoopen') ) ? $config->get('autoopen') :'';
+  $basepath           = \Drupal::request()->getSchemeAndHttpHost(). '/' ; 
+  $rootpath           = \Drupal::request()->getHost(). '/' . drupal_get_path('module', 'csat');//substr(drupal_get_path_alias(), 0, strripos(drupal_get_path_alias(), '/') );
+  $path               = \Drupal::request()->getSchemeAndHttpHost(). '/' .drupal_get_path('module', 'csat');
+  $allow              = !empty( $path_matches_allow ) ? $path_matches_allow :'';
+  $deny               = !empty( $path_matches ) ? $path_matches :'';
+  $enabled            = !empty( $config->get('global') ) ? $config->get('global') :'';
+  $attachments['#attached']['html_head'][] = [
+    [
+      '#tag'   => 'script',
+      '#value' => "var config_message = '$message' ;
+                   var config_top = '$top' ;
+                   var config_height = '$height' ;
+                   var config_width = '$width' ;
+                   var config_question = '$question' ;
+                   var config_bgcolor = '$bgcolor' ;
+                   var config_align = '$align' ;
+                   var config_minutes = '$minutes' ;
+                   var config_open = '$open' ;
+                   var config_basepath = '$basepath' ;
+                   var config_rootpath = '$rootpath' ;
+                   var config_path = '$path' ;
+                   var config_allow = '$allow' ;
+                   var config_deny = '$deny' ;
+                   var config_enabled = '$enabled' ;",
+    ],
+    'access csat form',
+  ];
+  
+  $current_path = \Drupal::request()->getRequestUri() ;
+  if(strpos($current_path, '/csat_report') == false)
+  {
+    $attachments['#attached']['library'][] = 'csat/csat-link';
+  }
+
+}

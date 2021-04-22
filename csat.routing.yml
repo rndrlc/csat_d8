@@ -1,0 +1,28 @@
+csat.settings:
+  path: '/admin/config/content/csat'
+  defaults:
+    _form: '\Drupal\csat\Form\CsatSettingsForm'
+    _title: 'CSAT Config'
+  requirements:
+    _permission: 'administer csat settings'
+
+csat_list.form:
+  path: '/admin/config/content/csat_report'
+  defaults: 
+    _form: '\Drupal\csat\Form\ReportCsat'
+    _title: 'CSAT Report'
+  requirements: 
+    _permission: 'manage csat submissions'
+
+csat_save.form:
+  path: '/csat/submit'
+  defaults:
+    _controller: '\Drupal\csat\Controller\AdminFeedbackController::csat_submit'
+    _title: 'CSAT Submit'
+  requirements:
+    _access: 'TRUE'
+    _permission: 'access csat form'
+    _method: 'POST'
+    #_role: administrator
+  options:
+    no_cache: 'TRUE'

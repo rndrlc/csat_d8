@@ -1,0 +1,12 @@
+csat.settings:
+  title: 'CSAT Config'
+  description: 'Configure settings for csat.'
+  parent: system.admin_config_content
+  route_name: csat.settings
+
+csat_list.form:
+  title: 'CSAT Report'
+  description: 'Report for csat feedbacks.'
+  parent: system.admin_config_content
+  route_name: csat_list.form
+  

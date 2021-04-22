@@ -1,0 +1,13 @@
+administer csat settings:
+  title: 'Administer csat settings'
+  description: 'Administer csat display settings'
+  restrict access: true
+
+manage csat submissions:
+  title: 'Manage csat submissions'
+  description: 'Manage csat submissions.'
+  restrict access: true
+
+access csat form:
+  title: 'Use csat form'
+  description: 'Access the csat form'

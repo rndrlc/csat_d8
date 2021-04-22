@@ -1,0 +1,9 @@
+csat.settings:
+  type: config_object
+  label: 'Node types settings'
+  mapping:
+    content_types:
+      label: 'Node types to display csat link'
+      type: sequence
+      sequence:
+        type: string

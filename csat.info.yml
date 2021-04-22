@@ -1,0 +1,9 @@
+name: CSAT
+type: module
+description: 'Allows users to report feedback on site content.'
+configure: csat.settings
+core_version_requirement: ^8 || ^9
+package: Custom
+version: '8.x-1.3'
+project: 'csat'
+datestamp: 1600860778

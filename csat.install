@@ -1,0 +1,340 @@
+<?php
+  use Drupal\user\Entity\Role;
+  use Drupal\user\RoleInterface;
+ 
+
+// function csat_install()
+// {
+
+//   $roles = Role::loadMultiple([
+//     RoleInterface::ANONYMOUS_ID,
+//     RoleInterface::AUTHENTICATED_ID
+//   ]);
+ 
+//   $issueAccessPermissions = [
+//     "access csat form"
+//   ];
+ 
+//   foreach ($issueAccessPermissions as $permission) {
+//     $roles[RoleInterface::AUTHENTICATED_ID]->grantPermission($permission);
+//     $roles[RoleInterface::ANONYMOUS_ID]->grantPermission($permission);
+//   }
+// }
+/**
+ * @file
+ * Installing Database Table.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function csat_schema() {
+  // $schema['csat'] = [
+  //   'fields' => [
+  //     'id' => [
+  //       'type' => 'serial',
+  //       'not null' => TRUE,
+  //     ],
+  //     'name' => [
+  //       'type' => 'varchar',
+  //       'length' => 255,
+  //       'not null' => FALSE,
+  //     ],
+  //     'email' => [
+  //       'type' => 'varchar',
+  //       'length' => 255,
+  //       'not null' => FALSE,
+  //     ],
+  //     'message' => [
+  //       'type' => 'text',
+  //       'not null' => TRUE,
+  //       'size' => 'big',
+  //     ],
+  //     'path' => [
+  //       'type' => 'varchar',
+  //       'length' => 255,
+  //       'not null' => TRUE,
+  //     ],
+  //     'ipaddress' => [
+  //       'type' => 'varchar',
+  //       'length' => 255,
+  //       'not null' => TRUE,
+  //     ],
+  //     'created' => [
+  //       'type' => 'int',
+  //       'not null' => TRUE,
+  //       'default' => 0,
+  //     ],
+  //     'updated' => [
+  //       'type' => 'int',
+  //       'not null' => TRUE,
+  //       'default' => 0,
+  //     ],
+  //     'status' => [
+  //       'type' => 'int',
+  //       'unsigned' => TRUE,
+  //       'not null' => TRUE,
+  //       'default' => 1,
+  //       'size' => 'tiny',
+  //     ],
+  //   ],
+  //   'primary key' => ['id'],
+  // ];
+  $schema = [];
+  $schema['csat'] = [
+    'fields' => [
+      'pid' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'first_name' => [
+        'type' => 'varchar',
+        'length' => 255,
+      ],
+      'last_name' => [
+        'type' => 'varchar',
+        'length' => 255,
+      ],
+      'email' => [
+        'type' => 'varchar',
+        'length' => 255,
+      ],
+      'rating' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ],
+      'score' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'comment' => [
+        'type' => 'varchar',
+        'length' => 1024,
+      ],
+      'followup' => [
+        'type' => 'varchar',
+        'length' => 1024,
+      ],
+      'locations' => [
+        'type' => 'varchar',
+        'length' => 1024,
+      ],
+      'department' => [
+        'type' => 'varchar',
+        'length' => 1024,
+      ],
+      'division' => [
+        'type' => 'varchar',
+        'length' => 1024,
+      ],
+      'ip_address' => [
+        'type' => 'varchar',
+        'length' => 1024,
+      ],
+      'data_privacy' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'created_at' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'release_id' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['pid'],
+  ];
+
+  $schema['csat_release'] = [
+    'fields' => [
+      'pid' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'status' => [
+        'type' => 'varchar',
+        'length' => 255,
+      ],
+      'created_by_id' => [
+        'type' => 'varchar',
+        'length' => 255,
+      ],
+      'start_date' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'end_date' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'created_at' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'department' => [
+        'type' => 'varchar',
+        'length' => 1024,
+      ],
+      'division' => [
+        'type' => 'varchar',
+        'length' => 1024,
+      ],
+    ],
+    'primary key' => ['pid'],
+  ];
+
+  $schema['csat_config'] = [
+    'fields' => [
+      'pid' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'mail_to' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ],
+      'mail_from' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ],
+      'mail_cc' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ],
+      'mail_bcc' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ],
+      'mail_title' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ],
+      'logo_dir' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ],
+      'site_name' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ],
+      'question' => [
+        'type' => 'varchar',
+        'length' => 500,
+        'not null' => TRUE,
+      ],
+      'message' => [
+        'type' => 'varchar',
+        'length' => 500,
+        'not null' => TRUE,
+        'default' => 'Thank you for your feedback',
+      ],
+      'department' => [
+        'type' => 'varchar',
+        'length' => 1024,
+      ],
+      'division' => [
+        'type' => 'varchar',
+        'length' => 1024,
+      ],
+      'with_detractor_comment' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'with_subscribe_updates' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'with_notification' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'privacy_url' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'default' => 'https://www.robinsonsland.com/privacy-policy/',
+      ],
+    ],
+    'primary key' => ['pid'],
+  ];
+
+  $schema['csat_audit_trail'] = [
+    'fields' => [
+      'pid' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'utable' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ],
+      'ucolumn' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ],
+      'uold_value' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ],
+      'unew_value' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ],
+      'updated_by' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ],
+      'created_at' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'department' => [
+        'type' => 'varchar',
+        'length' => 1024,
+      ],
+      'division' => [
+        'type' => 'varchar',
+        'length' => 1024,
+      ],
+    ],
+    'primary key' => ['pid'],
+  ];
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function csat_uninstall() {
+  \Drupal::configFactory()->getEditable('csat.settings')->delete();
+}

@@ -1,0 +1,33 @@
+csat-link:
+  version: 1.x
+  css:
+    theme:
+      css/csat.css: {}
+  js:
+    extension/js/jquery-3.5.1.js: {}
+    extension/js/sweetalert.min.js: {}
+    js/csat.js: {}
+
+csat-report:
+  version: 1.x
+  css:
+    theme:
+      extension/datepicker/datepicker.css: {}
+      extension/css/datatables.min.css: {}
+      extension/css/responsive.dataTables.min.css: {}
+      extension/css/buttons.dataTables.min.css: {}
+      css/csat.css: {}
+  js:
+    extension/js/jquery-3.5.1.js: {}
+    extension/js/datatables.min.js: {}
+    extension/js/dataTables.buttons.min.js: {}
+    extension/js/dataTables.responsive.min.js: {}
+    extension/js/jszip.min.js: {}
+    extension/js/pdfmake.min.js: {}
+    extension/js/vfs_fonts.js: {}
+    extension/js/buttons.html5.min.js: {}
+    extension/js/buttons.print.min.js: {}
+    extension/datepicker/datepicker.js: {}
+    extension/js/sweetalert.min.js: {}
+    js/csat.js: {}
+
