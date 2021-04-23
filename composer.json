@@ -1,7 +1,7 @@
 {
     "name": "rlc/csat_d8",
     "description": "Customer Satisfaction module for Drupal 8",
-    "type": "drupal-custom-module",
+    "type": "drupal-module",
     "require": {
         "drupal/core": "^8.1"
     },
