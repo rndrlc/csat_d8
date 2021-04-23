@@ -52,4 +52,4 @@ USAGE
 
 MAINTAINERS
 ------------
-CSAT - RLC R&D
+RLC R&D
