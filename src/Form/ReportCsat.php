@@ -170,6 +170,7 @@ class ReportCsat extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $form_state->setRebuild(TRUE);
     \Drupal::service('cache.render')->invalidateAll();
+    drupal_flush_all_caches();
   }
 
 
